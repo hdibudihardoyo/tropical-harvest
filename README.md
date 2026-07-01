@@ -101,7 +101,3 @@ npm install
 ```
 
 ---
-
-## 📄 License
-
-Project ini dibuat untuk keperluan pembelajaran dan pengembangan.
