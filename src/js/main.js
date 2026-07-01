@@ -1,72 +1,72 @@
 /* ============================================================
-   TropicalHarvest — Script Utama
-   Vanilla JS, tidak ada dependensi eksternal
+   B-Harvest — Main Script
+   Vanilla JS, no external dependencies
    ============================================================ */
 
 (function () {
   "use strict";
 
   /* --------------------------------------------------------
-     Deteksi preferensi reduced motion
+     Detect reduced motion preference
   -------------------------------------------------------- */
-  var gerakDikurangi = window.matchMedia(
+  var reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
 
   /* --------------------------------------------------------
-     1. NAVIGASI — Efek kaca saat scroll
+     1. NAVIGATION — Glass effect on scroll
   -------------------------------------------------------- */
-  var nav = document.getElementById("nav");
+  var navElement = document.getElementById("nav");
 
-  function perbaruiNav() {
+  function updateNav() {
     if (window.scrollY > 40) {
-      nav.classList.add("nav-solid", "nav-gelap");
+      navElement.classList.add("nav-solid", "nav-gelap");
     } else {
-      nav.classList.remove("nav-solid", "nav-gelap");
+      navElement.classList.remove("nav-solid", "nav-gelap");
     }
   }
 
-  perbaruiNav();
-  window.addEventListener("scroll", perbaruiNav, { passive: true });
+  updateNav();
+  window.addEventListener("scroll", updateNav, { passive: true });
 
   /* --------------------------------------------------------
-     2. MENU MOBILE — Buka / tutup
+     2. MOBILE MENU — Open / Close
   -------------------------------------------------------- */
-  var tombolMenu = document.getElementById("tombol-menu");
-  var menuMobile = document.getElementById("menu-mobile");
+  var menuButton = document.getElementById("tombol-menu");
+  var mobileMenu = document.getElementById("menu-mobile");
 
-  tombolMenu.addEventListener("click", function () {
-    var sedangTersembunyi = menuMobile.classList.contains("hidden");
-    menuMobile.classList.toggle("hidden");
-    tombolMenu.setAttribute("aria-expanded", String(sedangTersembunyi));
-    /* Pastikan nav solid saat menu mobile terbuka */
-    nav.classList.add("nav-solid", "nav-gelap");
+  menuButton.addEventListener("click", function () {
+    var isHidden = mobileMenu.classList.contains("hidden");
+    mobileMenu.classList.toggle("hidden");
+    menuButton.setAttribute("aria-expanded", String(isHidden));
+    /* Ensure nav solid when mobile menu opens */
+    navElement.classList.add("nav-solid", "nav-gelap");
   });
 
-  /* Tutup menu mobile ketika link diklik */
-  menuMobile.querySelectorAll("a").forEach(function (link) {
+  /* Close mobile menu when link is clicked */
+  mobileMenu.querySelectorAll("a").forEach(function (link) {
     link.addEventListener("click", function () {
-      menuMobile.classList.add("hidden");
-      tombolMenu.setAttribute("aria-expanded", "false");
+      mobileMenu.classList.add("hidden");
+      menuButton.setAttribute("aria-expanded", "false");
     });
   });
 
   /* --------------------------------------------------------
-     3. SCROLL HALUS
+     3. SMOOTH SCROLL
   -------------------------------------------------------- */
-  document.querySelectorAll('a[href^="#"]').forEach(function (tautan) {
-    tautan.addEventListener("click", function (e) {
-      var idTarget = this.getAttribute("href");
-      if (idTarget.length < 2) return;
-      var target = document.querySelector(idTarget);
+  document.querySelectorAll('a[href^="#"]').forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      var targetId = this.getAttribute("href");
+      if (targetId.length < 2) return;
+      var target = document.querySelector(targetId);
       if (!target) return;
       e.preventDefault();
-      var offset = 64; /* Tinggi nav */
-      var posisiAtas =
+      var offset = 64; /* Nav height */
+      var topPosition =
         target.getBoundingClientRect().top + window.pageYOffset - offset;
       window.scrollTo({
-        top: posisiAtas,
-        behavior: gerakDikurangi ? "auto" : "smooth",
+        top: topPosition,
+        behavior: reducedMotion ? "auto" : "smooth",
       });
     });
   });
@@ -74,118 +74,118 @@
   /* --------------------------------------------------------
      4. REVEAL ON SCROLL
   -------------------------------------------------------- */
-  var elemenReveal = document.querySelectorAll(".reveal, .reveal-stagger");
+  var revealElements = document.querySelectorAll(".reveal, .reveal-stagger");
 
-  if ("IntersectionObserver" in window && !gerakDikurangi) {
-    var io = new IntersectionObserver(
-      function (entri) {
-        entri.forEach(function (entri) {
-          if (entri.isIntersecting) {
-            entri.target.classList.add("is-visible");
-            io.unobserve(entri.target);
+  if ("IntersectionObserver" in window && !reducedMotion) {
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
           }
         });
       },
       { threshold: 0.15, rootMargin: "0px 0px -60px 0px" },
     );
-    elemenReveal.forEach(function (el) {
-      io.observe(el);
+    revealElements.forEach(function (el) {
+      observer.observe(el);
     });
   } else {
-    /* Fallback: langsung tampilkan semua */
-    elemenReveal.forEach(function (el) {
+    /* Fallback: show all immediately */
+    revealElements.forEach(function (el) {
       el.classList.add("is-visible");
     });
   }
 
   /* --------------------------------------------------------
-     5. JALUR EKSPOR 
+     5. EXPORT PROCESS
   -------------------------------------------------------- */
-  var bungkusRute = document.getElementById("bungkus-rute");
+  var routeWrapper = document.getElementById("bungkus-rute");
 
-  if (bungkusRute) {
-    var garisRute = document.getElementById("garis-rute");
-    var titikRute = bungkusRute.querySelectorAll(".titik-rute");
+  if (routeWrapper) {
+    var routeLine = document.getElementById("garis-rute");
+    var routePoints = routeWrapper.querySelectorAll(".titik-rute");
 
-    var ioRute = new IntersectionObserver(
-      function (entri) {
-        entri.forEach(function (entri) {
-          if (entri.isIntersecting) {
-            /* Gambar garis */
-            if (garisRute) garisRute.classList.add("sudah-digambar");
-            /* Pop-in setiap titik secara berurutan */
-            titikRute.forEach(function (titik, i) {
+    var routeObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            /* Draw line */
+            if (routeLine) routeLine.classList.add("drawn");
+            /* Pop-in each point sequentially */
+            routePoints.forEach(function (point, i) {
               setTimeout(
                 function () {
-                  titik.classList.add("tampil");
+                  point.classList.add("show");
                 },
                 250 + i * 220,
               );
             });
-            ioRute.unobserve(entri.target);
+            routeObserver.unobserve(entry.target);
           }
         });
       },
       { threshold: 0.25 },
     );
 
-    ioRute.observe(bungkusRute);
+    routeObserver.observe(routeWrapper);
   }
 
   /* --------------------------------------------------------
-     6. COUNTER STATISTIK 
+     6. COUNTER STATISTICS
   -------------------------------------------------------- */
-  var semuaCounter = document.querySelectorAll("[data-jumlah]");
+  var allCounters = document.querySelectorAll("[data-jumlah]");
 
-  function animasiCounter(el) {
+  function animateCounter(el) {
     var target = parseInt(el.getAttribute("data-jumlah"), 10);
-    if (gerakDikurangi) {
+    if (reducedMotion) {
       el.textContent = target.toLocaleString("id-ID");
       return;
     }
-    var durasi = 1400;
-    var mulai = null;
+    var duration = 1400;
+    var startTime = null;
 
-    function langkah(ts) {
-      if (!mulai) mulai = ts;
-      var progres = Math.min((ts - mulai) / durasi, 1);
-      var eased = 1 - Math.pow(1 - progres, 3); /* ease-out cubic */
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = Math.min((ts - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3); /* ease-out cubic */
       el.textContent = Math.round(eased * target).toLocaleString("id-ID");
-      if (progres < 1) requestAnimationFrame(langkah);
+      if (progress < 1) requestAnimationFrame(step);
     }
 
-    requestAnimationFrame(langkah);
+    requestAnimationFrame(step);
   }
 
-  if (semuaCounter.length) {
-    var ioStat = new IntersectionObserver(
-      function (entri) {
-        entri.forEach(function (entri) {
-          if (entri.isIntersecting) {
-            animasiCounter(entri.target);
-            ioStat.unobserve(entri.target);
+  if (allCounters.length) {
+    var statObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            animateCounter(entry.target);
+            statObserver.unobserve(entry.target);
           }
         });
       },
       { threshold: 0.5 },
     );
-    semuaCounter.forEach(function (c) {
-      ioStat.observe(c);
+    allCounters.forEach(function (c) {
+      statObserver.observe(c);
     });
   }
 
   /* --------------------------------------------------------
      7. PARALLAX HERO
   -------------------------------------------------------- */
-  var gambarHero = document.getElementById("gambar-hero");
+  var heroImage = document.getElementById("gambar-hero");
 
-  if (gambarHero && !gerakDikurangi) {
+  if (heroImage && !reducedMotion) {
     window.addEventListener(
       "scroll",
       function () {
         var y = window.scrollY;
         if (y < window.innerHeight) {
-          gambarHero.style.transform =
+          heroImage.style.transform =
             "translateY(" + y * 0.18 + "px) scale(1.08)";
         }
       },
@@ -194,101 +194,135 @@
   }
 
   /* --------------------------------------------------------
-     8. RIPPLE BUTTON 
+     8. RIPPLE BUTTON
   -------------------------------------------------------- */
-  document.querySelectorAll(".tombol-ripple").forEach(function (tombol) {
-    tombol.addEventListener("click", function (e) {
-      var rect = tombol.getBoundingClientRect();
-      var lingk = document.createElement("span");
-      var ukuran = Math.max(rect.width, rect.height) * 1.2;
+  document.querySelectorAll(".tombol-ripple").forEach(function (button) {
+    button.addEventListener("click", function (e) {
+      var rect = button.getBoundingClientRect();
+      var ripple = document.createElement("span");
+      var size = Math.max(rect.width, rect.height) * 1.2;
 
-      lingk.className = "lingkaran-ripple";
-      lingk.style.width = lingk.style.height = ukuran + "px";
-      lingk.style.left = e.clientX - rect.left - ukuran / 2 + "px";
-      lingk.style.top = e.clientY - rect.top - ukuran / 2 + "px";
+      ripple.className = "lingkaran-ripple";
+      ripple.style.width = ripple.style.height = size + "px";
+      ripple.style.left = e.clientX - rect.left - size / 2 + "px";
+      ripple.style.top = e.clientY - rect.top - size / 2 + "px";
 
-      tombol.appendChild(lingk);
+      button.appendChild(ripple);
       setTimeout(function () {
-        lingk.remove();
+        ripple.remove();
       }, 650);
     });
   });
 
   /* --------------------------------------------------------
-     9. CAROUSEL TESTIMONI 
+     9. TESTIMONIAL CAROUSEL — Responsive, Accessible, Auto-play
+     Supports 3+ slides with dynamic dot navigation
   -------------------------------------------------------- */
-  var jalurTesti = document.getElementById("jalur-testi");
-  var bungkusDot = document.getElementById("dot-testi");
-  var tombolPrev = document.getElementById("testi-prev");
-  var tombolNext = document.getElementById("testi-next");
+  var testimonialTrack = document.getElementById("jalur-testi");
+  var dotContainer = document.getElementById("dot-testi");
+  var prevButton = document.getElementById("testi-prev");
+  var nextButton = document.getElementById("testi-next");
 
-  if (jalurTesti) {
-    var totalSlide = jalurTesti.children.length;
-    var slideAktif = 0;
+  if (testimonialTrack) {
+    /* Carousel config */
+    var carouselConfig = {
+      totalSlides: testimonialTrack.children.length,
+      currentSlide: 0,
+      autoplayInterval: 6000,
+      autoplayTimer: null,
+    };
 
-    /* Buat dot navigasi */
-    for (var i = 0; i < totalSlide; i++) {
-      var dot = document.createElement("button");
-      dot.setAttribute("aria-label", "Testimoni ke-" + (i + 1));
-      dot.className =
-        "w-2 h-2 rounded-full transition-colors " +
-        (i === 0 ? "bg-leaf" : "bg-ink/20");
+    /* Create dot navigation for each slide */
+    function createDotNavigation() {
+      for (var i = 0; i < carouselConfig.totalSlides; i++) {
+        var dot = document.createElement("button");
+        dot.setAttribute("aria-label", "Testimonial " + (i + 1));
+        dot.setAttribute("data-slide", i);
+        dot.className =
+          "w-2 h-2 rounded-full transition-colors " +
+          (i === 0 ? "bg-leaf" : "bg-ink/20");
 
-      dot.addEventListener(
-        "click",
-        (function (idx) {
-          return function () {
-            pindahSlide(idx);
-          };
-        })(i),
-      );
+        dot.addEventListener("click", function () {
+          goToSlide(parseInt(this.getAttribute("data-slide"), 10));
+        });
 
-      bungkusDot.appendChild(dot);
+        dotContainer.appendChild(dot);
+      }
     }
 
+    /* Update slide and indicator appearance */
     function renderSlide() {
-      jalurTesti.style.transform = "translateX(-" + slideAktif * 100 + "%)";
-      Array.prototype.forEach.call(bungkusDot.children, function (d, i) {
-        d.className =
+      var offsetX = -carouselConfig.currentSlide * 100;
+      testimonialTrack.style.transform = "translateX(" + offsetX + "%)";
+
+      /* Update all dot styles */
+      Array.prototype.forEach.call(dotContainer.children, function (dot, i) {
+        var isActive = i === carouselConfig.currentSlide;
+        dot.className =
           "w-2 h-2 rounded-full transition-colors " +
-          (i === slideAktif ? "bg-leaf" : "bg-ink/20");
+          (isActive ? "bg-leaf" : "bg-ink/20");
+        dot.setAttribute("aria-pressed", isActive);
       });
     }
 
-    function pindahSlide(idx) {
-      slideAktif = (idx + totalSlide) % totalSlide;
+    /* Go to specific slide (with wrapping) */
+    function goToSlide(idx) {
+      carouselConfig.currentSlide =
+        (idx + carouselConfig.totalSlides) % carouselConfig.totalSlides;
       renderSlide();
+      /* Reset autoplay timer */
+      startAutoplay();
     }
 
-    tombolPrev.addEventListener("click", function () {
-      pindahSlide(slideAktif - 1);
-    });
-    tombolNext.addEventListener("click", function () {
-      pindahSlide(slideAktif + 1);
+    /* Autoplay logic */
+    function startAutoplay() {
+      if (carouselConfig.autoplayTimer) {
+        clearInterval(carouselConfig.autoplayTimer);
+      }
+      carouselConfig.autoplayTimer = setInterval(function () {
+        goToSlide(carouselConfig.currentSlide + 1);
+      }, carouselConfig.autoplayInterval);
+    }
+
+    /* Event listeners */
+    prevButton.addEventListener("click", function () {
+      goToSlide(carouselConfig.currentSlide - 1);
     });
 
-    /* Autoplay setiap 6 detik, berhenti saat di-hover */
-    var autoplay = setInterval(function () {
-      pindahSlide(slideAktif + 1);
-    }, 6000);
-    jalurTesti.closest("section").addEventListener("mouseenter", function () {
-      clearInterval(autoplay);
+    nextButton.addEventListener("click", function () {
+      goToSlide(carouselConfig.currentSlide + 1);
     });
+
+    /* Pause autoplay on hover, resume on leave */
+    var testimonialSection = testimonialTrack.closest("section");
+    testimonialSection.addEventListener("mouseenter", function () {
+      if (carouselConfig.autoplayTimer) {
+        clearInterval(carouselConfig.autoplayTimer);
+      }
+    });
+    testimonialSection.addEventListener("mouseleave", function () {
+      startAutoplay();
+    });
+
+    /* Initialize */
+    createDotNavigation();
+    renderSlide();
+    startAutoplay();
   }
 
   /* --------------------------------------------------------
-     10. FORMULIR KONTAK 
+     10. CONTACT FORM
   -------------------------------------------------------- */
-  var formKontak = document.getElementById("form-kontak");
+  var contactForm = document.getElementById("form-kontak");
 
-  if (formKontak) {
-    formKontak.addEventListener("submit", function (e) {
+  if (contactForm) {
+    contactForm.addEventListener("submit", function (e) {
       e.preventDefault();
-      var pesanSukses = document.getElementById("pesan-sukses");
-      pesanSukses.classList.remove("hidden");
+      var successMessage = document.getElementById("pesan-sukses");
+      successMessage.classList.remove("hidden");
 
-      /* Nonaktifkan semua input setelah kirim */
-      formKontak
+      /* Disable all inputs after submit */
+      contactForm
         .querySelectorAll("input, textarea, select")
         .forEach(function (field) {
           if (field.type !== "submit") field.disabled = true;

@@ -223,13 +223,13 @@ body {
   }
 }
 
-.jalur-marquee {
+.marquee-track {
   display: flex;
   width: max-content;
   animation: marquee 32s linear infinite;
 }
 
-.bungkus-marquee:hover .jalur-marquee {
+.marquee-wrapper:hover .marquee-track {
   animation-play-state: paused;
 }
 
@@ -252,7 +252,7 @@ body {
   transition: stroke-dasharray 1.8s var(--ease-quint);
 }
 
-.garis-rute.sudah-digambar {
+.garis-rute.drawn {
   stroke-dasharray: 3000 0;
 }
 
@@ -264,7 +264,7 @@ body {
     transform 0.5s var(--ease-quint);
 }
 
-.titik-rute.tampil {
+.titik-rute.show {
   opacity: 1;
   transform: scale(1);
 }
